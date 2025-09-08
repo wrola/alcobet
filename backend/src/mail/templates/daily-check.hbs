@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Daily Check - {{userName}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .question { background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107; }
+        .buttons { text-align: center; margin: 30px 0; }
+        .btn { display: inline-block; padding: 15px 30px; margin: 0 10px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .details { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 30px; font-size: 14px; color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Daily Check for {{userName}}</h1>
+        <p>Date: {{checkDate}}</p>
+    </div>
+
+    <div class="question">
+        <h2>Did {{userName}} drink alcohol yesterday?</h2>
+        <p>Please click one of the buttons below to record your response.</p>
+    </div>
+
+    <div class="buttons">
+        <a href="{{baseUrl}}/trustman/response/{{token}}?response=clean" class="btn btn-success">
+            No, they stayed clean ✓
+        </a>
+        <a href="{{baseUrl}}/trustman/response/{{token}}?response=drank" class="btn btn-danger">
+            Yes, they drank alcohol ✗
+        </a>
+    </div>
+
+    <div class="details">
+        <p><strong>Bet Details:</strong></p>
+        <p>Amount: ${{amount}}</p>
+        <p>Deadline: {{deadline}}</p>
+        <p>Your response helps determine if {{userName}} succeeds in their commitment.</p>
+        <p>This link expires in 24 hours.</p>
+    </div>
+</body>
+</html>
