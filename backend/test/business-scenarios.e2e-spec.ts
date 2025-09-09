@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, BadRequestException } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppModule } from '../src/app.module';
 import { User } from '../src/users/user.entity';
@@ -141,7 +141,7 @@ describe('Business Scenarios (e2e)', () => {
       const bet = await betsService.create({
         trustmanEmail: 'trustman@example.com',
         amount: 100,
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days
       }, testUser);
 
       // Create daily check with old date (expired)
@@ -178,7 +178,7 @@ describe('Business Scenarios (e2e)', () => {
       const bet = await betsService.create({
         trustmanEmail: 'trustman@example.com',
         amount: 100,
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       }, testUser);
 
       const dailyCheck = await dailyChecksService.createDailyCheck(bet, new Date());
