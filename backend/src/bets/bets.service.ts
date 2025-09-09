@@ -4,14 +4,12 @@ import { Repository } from 'typeorm';
 import { Bet } from './bet.entity';
 import { User } from '../users/user.entity';
 import { CreateBetDto } from './dto/create-bet.dto';
-import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class BetsService {
   constructor(
     @InjectRepository(Bet)
     private betsRepository: Repository<Bet>,
-    private readonly mailService: MailService,
   ) {}
 
   async create(createBetDto: CreateBetDto, user: User): Promise<Bet> {
@@ -27,22 +25,7 @@ export class BetsService {
       user,
     });
 
-    const savedBet = await this.betsRepository.save(bet);
-
-    // Send notification email to trustman
-    try {
-      await this.mailService.sendBetCreatedNotification(
-        createBetDto.trustmanEmail,
-        user.name,
-        createBetDto.amount,
-        createBetDto.deadline,
-      );
-    } catch (error) {
-      console.error('Failed to send bet creation notification:', error);
-      // Don't fail the bet creation if email fails
-    }
-
-    return savedBet;
+    return this.betsRepository.save(bet);
   }
 
   async findByUser(userId: number): Promise<Bet[]> {

@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { appConfig, validationSchema } from './config/configuration';
 
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -20,23 +19,13 @@ import { DailyCheck } from './daily-checks/daily-check.entity';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig],
-      validationSchema,
-      validationOptions: {
-        allowUnknown: true,
-        abortEarly: true,
-      },
     }),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'sqlite',
-        database: configService.get<string>('app.database.url'),
-        entities: [User, Bet, DailyCheck],
-        synchronize: configService.get<string>('app.nodeEnv') !== 'production',
-        logging: configService.get<string>('app.nodeEnv') === 'development',
-        migrationsRun: configService.get<boolean>('app.database.migrationsRun'),
-      }),
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: process.env.DATABASE_URL || './database.sqlite',
+      entities: [User, Bet, DailyCheck],
+      synchronize: process.env.NODE_ENV !== 'production',
+      logging: process.env.NODE_ENV === 'development',
     }),
     ScheduleModule.forRoot(),
     AuthModule,

@@ -1,22 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
   
   app.use(
     session({
-      secret: configService.get<string>('app.session.secret'),
+      secret: process.env.SESSION_SECRET || 'fallback-secret-change-in-production',
       resave: false,
       saveUninitialized: false,
       cookie: {
         httpOnly: true,
-        secure: configService.get<string>('app.nodeEnv') === 'production',
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
       },
     }),
@@ -26,7 +24,7 @@ async function bootstrap() {
   app.use(passport.session());
 
   app.enableCors({
-    origin: configService.get<string>('app.urls.frontend'),
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
   });
 
@@ -36,7 +34,7 @@ async function bootstrap() {
     transform: true,
   }));
 
-  const port = configService.get<number>('app.port');
+  const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`Application is running on port ${port}`);
 }

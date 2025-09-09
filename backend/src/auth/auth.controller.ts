@@ -1,12 +1,9 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ConfigService } from '@nestjs/config';
 import { AuthGuard as CustomAuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private configService: ConfigService) {}
-
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth(@Req() req) {
@@ -17,7 +14,7 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res() res) {
     // Successful authentication, redirect to frontend
-    const frontendUrl = this.configService.get<string>('app.urls.frontend');
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     res.redirect(`${frontendUrl}/dashboard`);
   }
 

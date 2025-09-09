@@ -2,103 +2,44 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Check: {{userName}}</title>
+    <title>Daily Check - {{userName}}</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            line-height: 1.6; 
-            margin: 0; 
-            padding: 20px; 
-            background-color: #f4f4f4; 
-        }
-        .container { 
-            max-width: 600px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 10px; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
-        }
-        .header { 
-            text-align: center; 
-            margin-bottom: 30px; 
-        }
-        .amount { 
-            font-size: 24px; 
-            font-weight: bold; 
-            color: #2563eb; 
-        }
-        .question { 
-            font-size: 20px; 
-            margin: 20px 0; 
-            text-align: center; 
-        }
-        .buttons { 
-            text-align: center; 
-            margin: 30px 0; 
-        }
-        .btn { 
-            display: inline-block; 
-            padding: 15px 30px; 
-            margin: 0 10px; 
-            text-decoration: none; 
-            border-radius: 5px; 
-            font-weight: bold; 
-            font-size: 16px; 
-        }
-        .btn-yes { 
-            background-color: #dc2626; 
-            color: white; 
-        }
-        .btn-no { 
-            background-color: #16a34a; 
-            color: white; 
-        }
-        .footer { 
-            margin-top: 30px; 
-            font-size: 14px; 
-            color: #666; 
-            text-align: center; 
-        }
-        .progress { 
-            background-color: #e5e7eb; 
-            border-radius: 10px; 
-            padding: 15px; 
-            margin: 20px 0; 
-        }
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .question { background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107; }
+        .buttons { text-align: center; margin: 30px 0; }
+        .btn { display: inline-block; padding: 15px 30px; margin: 0 10px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .details { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 30px; font-size: 14px; color: #6c757d; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Daily Check: Is {{userName}} staying alcohol-free?</h1>
-            <div class="amount">${{amount}} commitment</div>
-        </div>
+    <div class="header">
+        <h1>Daily Check for {{userName}}</h1>
+        <p>Date: {{checkDate}}</p>
+    </div>
 
-        <div class="progress">
-            <strong>Progress:</strong> Day {{currentDay}} of {{totalDays}}<br>
-            <strong>Deadline:</strong> {{deadline}}
-        </div>
+    <div class="question">
+        <h2>Did {{userName}} drink alcohol yesterday?</h2>
+        <p>Please click one of the buttons below to record your response.</p>
+    </div>
 
-        <div class="question">
-            Did <strong>{{userName}}</strong> drink alcohol yesterday ({{checkDate}})?
-        </div>
+    <div class="buttons">
+        <a href="{{baseUrl}}/trustman/response/{{token}}?response=clean" class="btn btn-success">
+            No, they stayed clean ✓
+        </a>
+        <a href="{{baseUrl}}/trustman/response/{{token}}?response=drank" class="btn btn-danger">
+            Yes, they drank alcohol ✗
+        </a>
+    </div>
 
-        <div class="buttons">
-            <a href="{{baseUrl}}/trustman/response/{{token}}?response=drank" class="btn btn-yes">
-                YES, THEY DRANK
-            </a>
-            <a href="{{baseUrl}}/trustman/response/{{token}}?response=clean" class="btn btn-no">
-                NO, THEY STAYED CLEAN
-            </a>
-        </div>
-
-        <div class="footer">
-            <p>You're helping {{userName}} stay accountable for their commitment to quit drinking.</p>
-            <p>This is an automated email from AlcoBet. Please respond honestly.</p>
-            <p>If you have questions, reply to this email.</p>
-        </div>
+    <div class="details">
+        <p><strong>Bet Details:</strong></p>
+        <p>Amount: ${{amount}}</p>
+        <p>Deadline: {{deadline}}</p>
+        <p>Your response helps determine if {{userName}} succeeds in their commitment.</p>
+        <p>This link expires in 24 hours.</p>
     </div>
 </body>
 </html>
