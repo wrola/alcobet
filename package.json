@@ -1,0 +1,23 @@
+{
+  "name": "alcobet-monorepo",
+  "version": "1.0.0",
+  "description": "Alcohol abstinence betting application monorepo",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "build": "nx run-many -t build",
+    "test": "nx run-many -t test",
+    "lint": "nx run-many -t lint",
+    "dev": "nx run-many -t dev --parallel"
+  },
+  "devDependencies": {
+    "@nx/eslint": "^21.5.1",
+    "@nx/jest": "^21.5.1",
+    "@nx/node": "^21.5.1",
+    "@nx/vite": "^21.5.1",
+    "nx": "^21.5.1"
+  }
+}
