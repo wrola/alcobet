@@ -1,4 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { ConfigService } from "@nestjs/config";
+import { MailerService } from "@nestjs-modules/mailer";
 import { MailService } from "./mail.service";
 import { DailyCheck } from "../daily-checks/daily-check.entity";
 import { Bet } from "../bets/bet.entity";
@@ -6,6 +8,8 @@ import { User } from "../users/user.entity";
 
 describe("MailService", () => {
   let service: MailService;
+  let mailerService: MailerService;
+  let configService: ConfigService;
 
   const mockUser: User = {
     id: 1,
@@ -37,20 +41,35 @@ describe("MailService", () => {
     emailSentAt: null,
   };
 
+  const mockMailerService = {
+    sendMail: jest.fn(),
+  };
+
+  const mockConfigService = {
+    get: jest.fn((key: string) => {
+      if (key === "app.urls.backend") return "http://localhost:3000";
+      return undefined;
+    }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MailService],
+      providers: [
+        MailService,
+        {
+          provide: MailerService,
+          useValue: mockMailerService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+      ],
     }).compile();
 
     service = module.get<MailService>(MailService);
-
-    // Mock the transporter
-    service["transporter"] = {
-      sendMail: jest.fn(),
-    } as any;
-
-    // Mock environment variable
-    process.env.BACKEND_URL = "http://localhost:3000";
+    mailerService = module.get<MailerService>(MailerService);
+    configService = module.get<ConfigService>(ConfigService);
   });
 
   afterEach(() => {
@@ -58,42 +77,45 @@ describe("MailService", () => {
   });
 
   describe("sendDailyCheckEmail", () => {
-    it("should send daily check email with correct HTML content", async () => {
-      const mockTransporter = service["transporter"];
-      mockTransporter.sendMail.mockResolvedValue({ messageId: "test-id" });
+    it("should send daily check email with correct template and context", async () => {
+      mockMailerService.sendMail.mockResolvedValue({ messageId: "test-id" });
 
       const result = await service.sendDailyCheckEmail(mockDailyCheck);
 
-      expect(mockTransporter.sendMail).toHaveBeenCalledWith({
+      expect(mockMailerService.sendMail).toHaveBeenCalledWith({
         to: "trustman@example.com",
-        subject: "Daily Check: Test User - 2024-01-15",
-        html: expect.stringContaining("Did Test User drink alcohol yesterday?"),
+        subject: "Daily Check: Is Test User staying alcohol-free?",
+        template: "daily-check",
+        context: expect.objectContaining({
+          userName: "Test User",
+          amount: 100,
+          token: "test-token-123",
+          checkDate: "2024-01-15",
+          deadline: "2024-12-31",
+          baseUrl: "http://localhost:3000",
+        }),
       });
       expect(result).toBe(true);
     });
 
     it("should return false and log error if email sending fails", async () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
-      const mockTransporter = service["transporter"];
-      mockTransporter.sendMail.mockRejectedValue(
+      mockMailerService.sendMail.mockRejectedValue(
         new Error("SMTP connection failed"),
       );
 
       const result = await service.sendDailyCheckEmail(mockDailyCheck);
 
       expect(result).toBe(false);
-      consoleSpy.mockRestore();
     });
   });
 
   describe("sendBetCompletedEmail", () => {
     it("should send success email when bet is completed successfully", async () => {
-      const mockTransporter = service["transporter"];
-      mockTransporter.sendMail.mockResolvedValue({ messageId: "test-id" });
+      mockMailerService.sendMail.mockResolvedValue({ messageId: "test-id" });
 
       const result = await service.sendBetCompletedEmail(mockBet, true);
 
-      expect(mockTransporter.sendMail).toHaveBeenCalledWith({
+      expect(mockMailerService.sendMail).toHaveBeenCalledWith({
         to: "trustman@example.com",
         subject: "Congratulations! Test User completed their commitment",
         html: expect.stringContaining(
@@ -104,12 +126,11 @@ describe("MailService", () => {
     });
 
     it("should send failure email when bet fails", async () => {
-      const mockTransporter = service["transporter"];
-      mockTransporter.sendMail.mockResolvedValue({ messageId: "test-id" });
+      mockMailerService.sendMail.mockResolvedValue({ messageId: "test-id" });
 
       const result = await service.sendBetCompletedEmail(mockBet, false);
 
-      expect(mockTransporter.sendMail).toHaveBeenCalledWith({
+      expect(mockMailerService.sendMail).toHaveBeenCalledWith({
         to: "trustman@example.com",
         subject: "Test User's commitment ended",
         html: expect.stringContaining(
@@ -120,14 +141,33 @@ describe("MailService", () => {
     });
 
     it("should return false if email sending fails", async () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
-      const mockTransporter = service["transporter"];
-      mockTransporter.sendMail.mockRejectedValue(new Error("Email failed"));
+      mockMailerService.sendMail.mockRejectedValue(new Error("Email failed"));
 
       const result = await service.sendBetCompletedEmail(mockBet, true);
 
       expect(result).toBe(false);
-      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("sendBetCreatedNotification", () => {
+    it("should send bet created notification", async () => {
+      mockMailerService.sendMail.mockResolvedValue({ messageId: "test-id" });
+
+      const result = await service.sendBetCreatedNotification(
+        "trustman@example.com",
+        "Test User",
+        100,
+        "2024-12-31",
+      );
+
+      expect(mockMailerService.sendMail).toHaveBeenCalledWith({
+        to: "trustman@example.com",
+        subject: "You've been chosen as a trustman for Test User",
+        html: expect.stringContaining(
+          "has committed $100 to quit drinking until",
+        ),
+      });
+      expect(result).toBe(true);
     });
   });
 });
