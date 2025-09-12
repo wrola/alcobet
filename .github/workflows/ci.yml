@@ -11,7 +11,7 @@ env:
   NODE_VERSION: 20
 
 jobs:
-  main:
+  build:
     runs-on: ubuntu-latest
     
     steps:
@@ -36,7 +36,7 @@ jobs:
         run: npx nx affected -t lint --parallel=3
 
       - name: Run tests
-        run: npx nx affected -t test --parallel=3 --configuration=ci
+        run: npx nx affected -t test --parallel=3
 
       - name: Run build
         run: npx nx affected -t build --parallel=3
@@ -48,7 +48,7 @@ jobs:
           directory: ./coverage
 
   deploy:
-    needs: main
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
