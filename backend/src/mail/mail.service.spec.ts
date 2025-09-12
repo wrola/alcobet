@@ -8,8 +8,6 @@ import { User } from "../users/user.entity";
 
 describe("MailService", () => {
   let service: MailService;
-  let mailerService: MailerService;
-  let configService: ConfigService;
 
   const mockUser: User = {
     id: 1,
@@ -68,8 +66,6 @@ describe("MailService", () => {
     }).compile();
 
     service = module.get<MailService>(MailService);
-    mailerService = module.get<MailerService>(MailerService);
-    configService = module.get<ConfigService>(ConfigService);
   });
 
   afterEach(() => {

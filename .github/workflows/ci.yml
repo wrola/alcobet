@@ -8,7 +8,7 @@ on:
 
 env:
   NX_CACHE_DIRECTORY: tmp/nx-cache
-  NODE_VERSION: 18
+  NODE_VERSION: 20
 
 jobs:
   main:
@@ -72,15 +72,3 @@ jobs:
 
       - name: Build applications for production
         run: npx nx run-many -t build --configuration=production --parallel=3
-
-      - name: Deploy Backend
-        run: |
-          echo "Backend deployment would go here"
-          echo "Built backend files are in: backend/dist"
-          ls -la backend/dist || echo "Backend dist not found"
-
-      - name: Deploy Frontend
-        run: |
-          echo "Frontend deployment would go here"
-          echo "Built frontend files are in: frontend/dist"
-          ls -la frontend/dist || echo "Frontend dist not found"
