@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { DailyCheck } from './daily-check.entity';
-import { Bet } from '../bets/bet.entity';
-import { v4 as uuidv4 } from 'uuid';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { DailyCheck } from "./daily-check.entity";
+import { Bet } from "../bets/bet.entity";
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class DailyChecksService {
@@ -27,34 +27,37 @@ export class DailyChecksService {
     return this.dailyChecksRepository.save(dailyCheck);
   }
 
-  async findByBetAndDate(betId: number, date: Date): Promise<DailyCheck | null> {
+  async findByBetAndDate(
+    betId: number,
+    date: Date,
+  ): Promise<DailyCheck | null> {
     return this.dailyChecksRepository.findOne({
       where: {
         bet: { id: betId },
         checkDate: date,
       },
-      relations: ['bet'],
+      relations: ["bet"],
     });
   }
 
   async findByToken(token: string): Promise<DailyCheck | null> {
     return this.dailyChecksRepository.findOne({
       where: { responseToken: token },
-      relations: ['bet', 'bet.user'],
+      relations: ["bet", "bet.user"],
     });
   }
 
   async updateResponse(
     dailyCheckId: number,
-    response: 'clean' | 'drank',
+    response: "clean" | "drank",
   ): Promise<DailyCheck> {
     const dailyCheck = await this.dailyChecksRepository.findOne({
       where: { id: dailyCheckId },
-      relations: ['bet'],
+      relations: ["bet"],
     });
 
     if (!dailyCheck) {
-      throw new Error('Daily check not found');
+      throw new Error("Daily check not found");
     }
 
     dailyCheck.response = response;
@@ -75,7 +78,7 @@ export class DailyChecksService {
         response: null,
         emailSentAt: null,
       },
-      relations: ['bet', 'bet.user'],
+      relations: ["bet", "bet.user"],
     });
   }
 }

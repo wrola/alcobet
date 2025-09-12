@@ -1,4 +1,4 @@
-import { IsEmail, IsNumber, IsDateString, Min } from 'class-validator';
+import { IsEmail, IsNumber, IsDateString, Min } from "class-validator";
 
 export class CreateBetDto {
   @IsEmail()

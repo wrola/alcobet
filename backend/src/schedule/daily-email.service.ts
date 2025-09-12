@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { BetsService } from '../bets/bets.service';
-import { DailyChecksService } from '../daily-checks/daily-checks.service';
-import { MailService } from '../mail/mail.service';
+import { Injectable, Logger } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
+import { BetsService } from "../bets/bets.service";
+import { DailyChecksService } from "../daily-checks/daily-checks.service";
+import { MailService } from "../mail/mail.service";
 
 @Injectable()
 export class DailyEmailService {
@@ -14,9 +14,9 @@ export class DailyEmailService {
     private readonly mailService: MailService,
   ) {}
 
-  @Cron('0 9 * * *') // Run at 9 AM every day
+  @Cron("0 9 * * *") // Run at 9 AM every day
   async sendDailyChecks() {
-    this.logger.log('Starting daily email job');
+    this.logger.log("Starting daily email job");
 
     try {
       const activeBets = await this.betsService.findActiveBets();
@@ -28,7 +28,10 @@ export class DailyEmailService {
       for (const bet of activeBets) {
         try {
           // Create daily check for today if it doesn't exist
-          const dailyCheck = await this.dailyChecksService.createDailyCheck(bet, today);
+          const dailyCheck = await this.dailyChecksService.createDailyCheck(
+            bet,
+            today,
+          );
 
           // Skip if email already sent
           if (dailyCheck.emailSentAt) {
@@ -36,13 +39,16 @@ export class DailyEmailService {
           }
 
           // Send email
-          const emailSent = await this.mailService.sendDailyCheckEmail(dailyCheck);
-          
+          const emailSent =
+            await this.mailService.sendDailyCheckEmail(dailyCheck);
+
           if (emailSent) {
             await this.dailyChecksService.markEmailSent(dailyCheck.id);
             this.logger.log(`Daily check email sent for bet ${bet.id}`);
           } else {
-            this.logger.error(`Failed to send daily check email for bet ${bet.id}`);
+            this.logger.error(
+              `Failed to send daily check email for bet ${bet.id}`,
+            );
           }
         } catch (error) {
           this.logger.error(`Error processing bet ${bet.id}: ${error.message}`);
@@ -51,12 +57,14 @@ export class DailyEmailService {
 
       // Check for expired bets and mark them as completed
       await this.checkExpiredBets();
-
     } catch (error) {
-      this.logger.error(`Daily email job failed: ${error.message}`, error.stack);
+      this.logger.error(
+        `Daily email job failed: ${error.message}`,
+        error.stack,
+      );
     }
 
-    this.logger.log('Daily email job completed');
+    this.logger.log("Daily email job completed");
   }
 
   private async checkExpiredBets() {
@@ -66,11 +74,13 @@ export class DailyEmailService {
 
       for (const bet of expiredBets) {
         // Check if all daily checks were clean (no 'drank' responses)
-        const drankResponses = bet.dailyChecks.filter(check => check.response === 'drank');
-        
+        const drankResponses = bet.dailyChecks.filter(
+          (check) => check.response === "drank",
+        );
+
         if (drankResponses.length === 0) {
           // Success - user gets money back
-          await this.betsService.updateStatus(bet.id, 'completed');
+          await this.betsService.updateStatus(bet.id, "completed");
           await this.mailService.sendBetCompletedEmail(bet, true);
           this.logger.log(`Bet ${bet.id} marked as completed (success)`);
         } else {

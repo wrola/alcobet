@@ -48,8 +48,9 @@ const CreateBetPage: React.FC = () => {
       if (success) {
         navigate('/dashboard');
       }
-    } catch (error: any) {
-      form.setFieldError('submit', error.response?.data?.message || 'Failed to create bet. Please try again.');
+    } catch (error: unknown) {
+      const networkError = error as { response?: { data?: { message?: string } } };
+      form.setFieldError('submit', networkError.response?.data?.message || 'Failed to create bet. Please try again.');
     }
   };
 

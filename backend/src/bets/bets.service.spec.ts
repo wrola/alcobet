@@ -1,14 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ForbiddenException } from '@nestjs/common';
-import { BetsService } from './bets.service';
-import { Bet } from './bet.entity';
-import { User } from '../users/user.entity';
+import { Test, TestingModule } from "@nestjs/testing";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { ForbiddenException } from "@nestjs/common";
+import { BetsService } from "./bets.service";
+import { Bet } from "./bet.entity";
+import { User } from "../users/user.entity";
 
-describe('BetsService', () => {
+describe("BetsService", () => {
   let service: BetsService;
-  let repository: Repository<Bet>;
 
   const mockRepository = {
     create: jest.fn(),
@@ -20,9 +18,9 @@ describe('BetsService', () => {
 
   const mockUser: User = {
     id: 1,
-    email: 'test@example.com',
-    name: 'Test User',
-    googleId: 'google123',
+    email: "test@example.com",
+    name: "Test User",
+    googleId: "google123",
     createdAt: new Date(),
     bets: [],
   };
@@ -39,20 +37,19 @@ describe('BetsService', () => {
     }).compile();
 
     service = module.get<BetsService>(BetsService);
-    repository = module.get<Repository<Bet>>(getRepositoryToken(Bet));
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('create', () => {
-    it('should create a bet with valid future deadline', async () => {
+  describe("create", () => {
+    it("should create a bet with valid future deadline", async () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
-      
+
       const createBetDto = {
-        trustmanEmail: 'trustman@example.com',
+        trustmanEmail: "trustman@example.com",
         amount: 100,
         deadline: tomorrow.toISOString(),
       };
@@ -71,43 +68,45 @@ describe('BetsService', () => {
       expect(result).toEqual(mockBet);
     });
 
-    it('should reject bet with past deadline', async () => {
+    it("should reject bet with past deadline", async () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      
+
       const createBetDto = {
-        trustmanEmail: 'trustman@example.com',
+        trustmanEmail: "trustman@example.com",
         amount: 100,
         deadline: yesterday.toISOString(),
       };
 
-      await expect(service.create(createBetDto, mockUser))
-        .rejects.toThrow(ForbiddenException);
+      await expect(service.create(createBetDto, mockUser)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
-    it('should reject bet with today as deadline', async () => {
+    it("should reject bet with today as deadline", async () => {
       const today = new Date();
-      
+
       const createBetDto = {
-        trustmanEmail: 'trustman@example.com',
+        trustmanEmail: "trustman@example.com",
         amount: 100,
         deadline: today.toISOString(),
       };
 
-      await expect(service.create(createBetDto, mockUser))
-        .rejects.toThrow(ForbiddenException);
+      await expect(service.create(createBetDto, mockUser)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
-  describe('findExpiredBets', () => {
-    it('should return bets past their deadline', async () => {
+  describe("findExpiredBets", () => {
+    it("should return bets past their deadline", async () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      
+
       const expiredBet = {
         id: 1,
         deadline: yesterday,
-        status: 'active',
+        status: "active",
         user: mockUser,
         dailyChecks: [],
       };
@@ -115,7 +114,7 @@ describe('BetsService', () => {
       const activeBet = {
         id: 2,
         deadline: new Date(Date.now() + 24 * 60 * 60 * 1000), // tomorrow
-        status: 'active',
+        status: "active",
         user: mockUser,
         dailyChecks: [],
       };
@@ -128,18 +127,20 @@ describe('BetsService', () => {
     });
   });
 
-  describe('updateStatus', () => {
-    it('should update bet status', async () => {
+  describe("updateStatus", () => {
+    it("should update bet status", async () => {
       mockRepository.update.mockResolvedValue({ affected: 1 });
 
-      await service.updateStatus(1, 'completed');
+      await service.updateStatus(1, "completed");
 
-      expect(mockRepository.update).toHaveBeenCalledWith(1, { status: 'completed' });
+      expect(mockRepository.update).toHaveBeenCalledWith(1, {
+        status: "completed",
+      });
     });
   });
 
-  describe('findByUser', () => {
-    it('should return user bets with daily checks ordered by creation date', async () => {
+  describe("findByUser", () => {
+    it("should return user bets with daily checks ordered by creation date", async () => {
       const mockBets = [
         { id: 1, user: mockUser, dailyChecks: [] },
         { id: 2, user: mockUser, dailyChecks: [] },
@@ -151,15 +152,15 @@ describe('BetsService', () => {
 
       expect(mockRepository.find).toHaveBeenCalledWith({
         where: { user: { id: 1 } },
-        relations: ['dailyChecks'],
-        order: { createdAt: 'DESC' },
+        relations: ["dailyChecks"],
+        order: { createdAt: "DESC" },
       });
       expect(result).toEqual(mockBets);
     });
   });
 
-  describe('findByIdAndUser', () => {
-    it('should return bet for specific user', async () => {
+  describe("findByIdAndUser", () => {
+    it("should return bet for specific user", async () => {
       const mockBet = { id: 1, user: mockUser, dailyChecks: [] };
       mockRepository.findOne.mockResolvedValue(mockBet);
 
@@ -167,12 +168,12 @@ describe('BetsService', () => {
 
       expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { id: 1, user: { id: 1 } },
-        relations: ['dailyChecks'],
+        relations: ["dailyChecks"],
       });
       expect(result).toEqual(mockBet);
     });
 
-    it('should return null for bet not belonging to user', async () => {
+    it("should return null for bet not belonging to user", async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
       const result = await service.findByIdAndUser(1, 999);
