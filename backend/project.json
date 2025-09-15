@@ -13,7 +13,7 @@
       },
       "configurations": {
         "production": {
-          "command": "nest build --webpack",
+          "command": "nest build",
           "cwd": "backend"
         }
       }
