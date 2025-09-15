@@ -49,3 +49,13 @@ export interface ApiError {
     message: string;
   }>;
 }
+
+export interface NetworkError {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}

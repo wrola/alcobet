@@ -1,0 +1,74 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NX_CACHE_DIRECTORY: tmp/nx-cache
+  NODE_VERSION: 20
+  NX_BASE: ${{ github.event.pull_request.base.sha }}
+  NX_HEAD: ${{ github.event.pull_request.head.sha }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup NX
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Run lint
+        run: npx nx affected -t lint --parallel=3
+
+      - name: Run tests
+        run: npx nx affected -t test --parallel=3
+
+      - name: Run build
+        run: npx nx affected -t build --parallel=3
+
+      - name: Upload coverage to Codecov (if tests ran)
+        if: success()
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup NX
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Build applications for production
+        run: npx nx run-many -t build --configuration=production --parallel=3

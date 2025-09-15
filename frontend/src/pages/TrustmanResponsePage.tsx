@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@mantine/core';
 import Layout from '../components/Layout';
@@ -16,16 +16,7 @@ const TrustmanResponsePage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [response, setResponse] = useState<'clean' | 'drank' | null>(null);
 
-  useEffect(() => {
-    if (token) {
-      fetchData();
-    } else {
-      setError('Invalid response link');
-      setLoading(false);
-    }
-  }, [token]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -35,9 +26,10 @@ const TrustmanResponsePage: React.FC = () => {
       if (responseData.alreadyResponded) {
         setSubmitted(true);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching trustman data:', err);
-      if (err.response?.status === 404) {
+      const networkError = err as { response?: { status?: number } };
+      if (networkError.response?.status === 404) {
         setError('This response link is invalid or has expired.');
       } else {
         setError('Failed to load response data. Please try again.');
@@ -45,7 +37,16 @@ const TrustmanResponsePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchData();
+    } else {
+      setError('Invalid response link');
+      setLoading(false);
+    }
+  }, [token, fetchData]);
 
   const handleSubmit = async (selectedResponse: 'clean' | 'drank') => {
     if (!token) return;
@@ -57,9 +58,10 @@ const TrustmanResponsePage: React.FC = () => {
       await BetsService.submitTrustmanResponse(token, selectedResponse);
       setResponse(selectedResponse);
       setSubmitted(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error submitting response:', err);
-      if (err.response?.status === 400) {
+      const networkError = err as { response?: { status?: number } };
+      if (networkError.response?.status === 400) {
         setError('This response has already been submitted or the link has expired.');
       } else {
         setError('Failed to submit response. Please try again.');

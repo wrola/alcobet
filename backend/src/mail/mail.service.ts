@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
-import { DailyCheck } from '../daily-checks/daily-check.entity';
-import { Bet } from '../bets/bet.entity';
+import { Injectable, Logger } from "@nestjs/common";
+import { MailerService } from "@nestjs-modules/mailer";
+import { ConfigService } from "@nestjs/config";
+import { DailyCheck } from "../daily-checks/daily-check.entity";
+import { Bet } from "../bets/bet.entity";
 
 @Injectable()
 export class MailService {
@@ -15,37 +15,45 @@ export class MailService {
 
   async sendDailyCheckEmail(dailyCheck: DailyCheck): Promise<boolean> {
     try {
-      const baseUrl = this.configService.get<string>('app.urls.backend');
+      const baseUrl = this.configService.get<string>("app.urls.backend");
       const currentDay = this.calculateCurrentDay(dailyCheck.bet.createdAt);
-      const totalDays = this.calculateTotalDays(dailyCheck.bet.createdAt, dailyCheck.bet.deadline);
+      const totalDays = this.calculateTotalDays(
+        dailyCheck.bet.createdAt,
+        dailyCheck.bet.deadline,
+      );
 
       await this.mailerService.sendMail({
         to: dailyCheck.bet.trustmanEmail,
         subject: `Daily Check: Is ${dailyCheck.bet.user.name} staying alcohol-free?`,
-        template: 'daily-check',
+        template: "daily-check",
         context: {
           userName: dailyCheck.bet.user.name,
           amount: dailyCheck.bet.amount,
           token: dailyCheck.responseToken,
-          checkDate: dailyCheck.checkDate.toISOString().split('T')[0],
-          deadline: dailyCheck.bet.deadline.toISOString().split('T')[0],
+          checkDate: dailyCheck.checkDate.toISOString().split("T")[0],
+          deadline: dailyCheck.bet.deadline.toISOString().split("T")[0],
           currentDay,
           totalDays,
           baseUrl,
         },
       });
 
-      this.logger.log(`Daily check email sent to ${dailyCheck.bet.trustmanEmail} for bet ${dailyCheck.bet.id}`);
+      this.logger.log(
+        `Daily check email sent to ${dailyCheck.bet.trustmanEmail} for bet ${dailyCheck.bet.id}`,
+      );
       return true;
     } catch (error) {
-      this.logger.error(`Failed to send daily check email: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to send daily check email: ${error.message}`,
+        error.stack,
+      );
       return false;
     }
   }
 
   async sendBetCompletedEmail(bet: Bet, isSuccess: boolean): Promise<boolean> {
     try {
-      const subject = isSuccess 
+      const subject = isSuccess
         ? `Congratulations! ${bet.user.name} completed their commitment`
         : `${bet.user.name}'s commitment ended`;
 
@@ -63,10 +71,15 @@ export class MailService {
         `,
       });
 
-      this.logger.log(`Bet completion email sent to ${bet.trustmanEmail} for bet ${bet.id}`);
+      this.logger.log(
+        `Bet completion email sent to ${bet.trustmanEmail} for bet ${bet.id}`,
+      );
       return true;
     } catch (error) {
-      this.logger.error(`Failed to send bet completion email: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to send bet completion email: ${error.message}`,
+        error.stack,
+      );
       return false;
     }
   }
@@ -92,7 +105,10 @@ export class MailService {
       this.logger.log(`Bet creation notification sent to ${trustmanEmail}`);
       return true;
     } catch (error) {
-      this.logger.error(`Failed to send bet creation notification: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to send bet creation notification: ${error.message}`,
+        error.stack,
+      );
       return false;
     }
   }
