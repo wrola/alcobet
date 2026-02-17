@@ -10,20 +10,20 @@ import { Bet } from "../bets/bet.entity";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  googleId: string;
+  googleId!: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @OneToMany(() => Bet, (bet) => bet.user)
-  bets: Bet[];
+  bets!: Bet[];
 }

@@ -12,26 +12,26 @@ import { DailyCheck } from "../daily-checks/daily-check.entity";
 @Entity()
 export class Bet {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @ManyToOne(() => User, (user) => user.bets)
-  user: User;
+  user!: User;
 
   @Column()
-  trustmanEmail: string;
+  trustmanEmail!: string;
 
   @Column("decimal", { precision: 10, scale: 2 })
-  amount: number;
+  amount!: number;
 
   @Column("date")
-  deadline: Date;
+  deadline!: Date;
 
   @Column({ default: "active" })
-  status: "active" | "completed" | "failed";
+  status!: "active" | "completed" | "failed";
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @OneToMany(() => DailyCheck, (check) => check.bet)
-  dailyChecks: DailyCheck[];
+  dailyChecks!: DailyCheck[];
 }

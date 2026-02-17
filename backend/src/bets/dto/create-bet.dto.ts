@@ -2,12 +2,12 @@ import { IsEmail, IsNumber, IsDateString, Min } from "class-validator";
 
 export class CreateBetDto {
   @IsEmail()
-  trustmanEmail: string;
+  trustmanEmail!: string;
 
   @IsNumber()
   @Min(1)
-  amount: number;
+  amount!: number;
 
   @IsDateString()
-  deadline: string;
+  deadline!: string;
 }

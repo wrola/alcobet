@@ -28,26 +28,26 @@ export interface AppConfig {
 export const appConfig = registerAs(
   "app",
   (): AppConfig => ({
-    port: parseInt(process.env.PORT, 10) || 3000,
-    nodeEnv: process.env.NODE_ENV || "development",
+    port: parseInt(process.env.PORT ?? "3000", 10) || 3000,
+    nodeEnv: process.env.NODE_ENV ?? "development",
     database: {
-      url: process.env.DATABASE_URL || "./database.sqlite",
+      url: process.env.DATABASE_URL ?? "./database.sqlite",
       migrationsRun: process.env.MIGRATIONS_RUN === "true",
     },
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     },
     session: {
-      secret: process.env.SESSION_SECRET,
+      secret: process.env.SESSION_SECRET ?? "",
     },
     mail: {
-      user: process.env.GMAIL_USER,
-      password: process.env.GMAIL_PASSWORD,
+      user: process.env.GMAIL_USER ?? "",
+      password: process.env.GMAIL_PASSWORD ?? "",
     },
     urls: {
-      frontend: process.env.FRONTEND_URL || "http://localhost:5173",
-      backend: process.env.BACKEND_URL || "http://localhost:3000",
+      frontend: process.env.FRONTEND_URL ?? "http://localhost:5173",
+      backend: process.env.BACKEND_URL ?? "http://localhost:3000",
     },
   }),
 );

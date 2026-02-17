@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { Request, Response, NextFunction } from "express";
 import * as request from "supertest";
 import { AppModule } from "../src/app.module";
 import { User } from "../src/users/user.entity";
@@ -27,9 +28,9 @@ describe("Bets API (e2e)", () => {
     app = moduleFixture.createNestApplication();
 
     // Mock session middleware for testing
-    app.use((req, res, next) => {
-      req.user = mockUser;
-      req.isAuthenticated = () => !!req.user;
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      (req as any).user = mockUser;
+      (req as any).isAuthenticated = () => !!(req as any).user;
       next();
     });
 

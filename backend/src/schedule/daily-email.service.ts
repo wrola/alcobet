@@ -51,17 +51,16 @@ export class DailyEmailService {
             );
           }
         } catch (error) {
-          this.logger.error(`Error processing bet ${bet.id}: ${error.message}`);
+          const err = error instanceof Error ? error : new Error(String(error));
+          this.logger.error(`Error processing bet ${bet.id}: ${err.message}`);
         }
       }
 
       // Check for expired bets and mark them as completed
       await this.checkExpiredBets();
     } catch (error) {
-      this.logger.error(
-        `Daily email job failed: ${error.message}`,
-        error.stack,
-      );
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(`Daily email job failed: ${err.message}`, err.stack);
     }
 
     this.logger.log("Daily email job completed");
@@ -89,7 +88,8 @@ export class DailyEmailService {
         }
       }
     } catch (error) {
-      this.logger.error(`Error checking expired bets: ${error.message}`);
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(`Error checking expired bets: ${err.message}`);
     }
   }
 }

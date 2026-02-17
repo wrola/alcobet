@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { IsNull, Repository } from "typeorm";
 import { DailyCheck } from "./daily-check.entity";
 import { Bet } from "../bets/bet.entity";
 import { v4 as uuidv4 } from "uuid";
@@ -75,8 +75,8 @@ export class DailyChecksService {
   async findPendingChecks(): Promise<DailyCheck[]> {
     return this.dailyChecksRepository.find({
       where: {
-        response: null,
-        emailSentAt: null,
+        response: IsNull(),
+        emailSentAt: IsNull(),
       },
       relations: ["bet", "bet.user"],
     });

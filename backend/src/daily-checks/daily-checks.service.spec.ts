@@ -1,5 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
+import { IsNull } from "typeorm";
 import { DailyChecksService } from "./daily-checks.service";
 import { DailyCheck } from "./daily-check.entity";
 import { Bet } from "../bets/bet.entity";
@@ -211,8 +212,8 @@ describe("DailyChecksService", () => {
 
       expect(mockRepository.find).toHaveBeenCalledWith({
         where: {
-          response: null,
-          emailSentAt: null,
+          response: IsNull(),
+          emailSentAt: IsNull(),
         },
         relations: ["bet", "bet.user"],
       });

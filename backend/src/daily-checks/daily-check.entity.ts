@@ -4,23 +4,23 @@ import { Bet } from "../bets/bet.entity";
 @Entity()
 export class DailyCheck {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @ManyToOne(() => Bet, (bet) => bet.dailyChecks)
-  bet: Bet;
+  bet!: Bet;
 
   @Column("date")
-  checkDate: Date;
+  checkDate!: Date;
 
   @Column({ nullable: true })
-  response: "clean" | "drank" | null;
+  response!: "clean" | "drank" | null;
 
   @Column({ nullable: true })
-  responseToken: string;
+  responseToken!: string;
 
   @Column({ nullable: true })
-  respondedAt: Date;
+  respondedAt!: Date | null;
 
   @Column({ nullable: true })
-  emailSentAt: Date;
+  emailSentAt!: Date | null;
 }

@@ -43,9 +43,10 @@ export class MailService {
       );
       return true;
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to send daily check email: ${error.message}`,
-        error.stack,
+        `Failed to send daily check email: ${err.message}`,
+        err.stack,
       );
       return false;
     }
@@ -76,9 +77,10 @@ export class MailService {
       );
       return true;
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to send bet completion email: ${error.message}`,
-        error.stack,
+        `Failed to send bet completion email: ${err.message}`,
+        err.stack,
       );
       return false;
     }
@@ -105,9 +107,10 @@ export class MailService {
       this.logger.log(`Bet creation notification sent to ${trustmanEmail}`);
       return true;
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to send bet creation notification: ${error.message}`,
-        error.stack,
+        `Failed to send bet creation notification: ${err.message}`,
+        err.stack,
       );
       return false;
     }

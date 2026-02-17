@@ -11,7 +11,7 @@ async function bootstrap() {
 
   app.use(
     session({
-      secret: configService.get<string>("app.session.secret"),
+      secret: configService.get<string>("app.session.secret")!,
       resave: false,
       saveUninitialized: false,
       cookie: {
@@ -38,7 +38,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = configService.get<number>("app.port");
+  const port = configService.get<number>("app.port") ?? 3000;
   await app.listen(port);
 }
 bootstrap();
