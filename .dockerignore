@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.nx
+*.sqlite
+*.db
+coverage
+tmp
+.env
+.env.*
+!.env.example
